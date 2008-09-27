@@ -1,3 +1,7 @@
+Version 1.2
+- Fixed error in constructor POD documentation
+- Adjusted version number in spec file, broken in 1.1
+
 Version 1.1
 - Added clone() method
 - Documentation additions and cleanups

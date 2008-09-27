@@ -1,6 +1,6 @@
 package Geometry::AffineTransform;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Carp;
 use Hash::Util;
 use Math::Trig ();
 
-# $Id: AffineTransform.pm 390 2008-09-08 09:26:05Z liyanage $
+# $Id: AffineTransform.pm 404 2008-09-27 10:48:15Z liyanage $
 
 =head1 NAME
 
@@ -79,8 +79,8 @@ In other words, invoking the constructor without arguments is equivalent to this
         m12 => 0,
         m21 => 0,
         m22 => 1,
-        tx  => 10,
-        ty  => 15
+        tx  => 0,
+        ty  => 0
     );
 
 =cut
