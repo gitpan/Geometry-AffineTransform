@@ -1,6 +1,6 @@
 package Geometry::AffineTransform;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use strict;
 use warnings;
@@ -8,8 +8,6 @@ use warnings;
 use Carp;
 use Hash::Util;
 use Math::Trig ();
-
-# $Id: AffineTransform.pm 404 2008-09-27 10:48:15Z liyanage $
 
 =head1 NAME
 
@@ -86,7 +84,7 @@ In other words, invoking the constructor without arguments is equivalent to this
 =cut
 
 sub new {
-	my $self = shift @_;
+	my $self = shift;
 	my (%args) = @_;
 
 	my $class = ref($self) || $self;
@@ -112,8 +110,35 @@ Returns a clone of the instance.
 =cut
 
 sub clone {
-	my $self = shift @_;
+	my $self = shift;
 	return $self->new()->set_matrix_2x3($self->matrix_2x3());
+}
+
+
+
+=head2 invert
+
+Inverts the state of the transformation.
+
+    my $inverted_clone = $t->clone()->invert();
+
+=cut
+
+sub invert {
+	my $self = shift;
+
+    my $det = $self->determinant();
+    
+  	croak "Unable to invert this transform (zero determinant)" unless $det;
+
+    return $self->set_matrix_2x3(
+        $self->{m22} / $det, # 11
+        -$self->{m12} / $det, # 12
+        -$self->{m21} / $det, # 21
+        $self->{m11} / $det, # 22
+        ($self->{m21} * $self->{ty} - $self->{m22} * $self->{tx}) / $det,
+        ($self->{m12} * $self->{tx} - $self->{m11} * $self->{ty}) / $det,
+    );
 }
 
 
@@ -126,6 +151,8 @@ This method expects an even number of positional parameters, each pair
 representing the x and y coordinates of a point.
 
 Returns the transformed list of coordinates in the same form as the input list.
+
+    my @output = $t->transform(2, 4, 10, 20);
 
 =cut
 
@@ -275,6 +302,14 @@ sub matrix_2x3 {
 	return $self->{m11}, $self->{m12}, $self->{m21}, $self->{m22}, $self->{tx}, $self->{ty};
 }
 
+
+# returns the determinant of the matrix
+sub determinant {
+	my $self = shift;
+	return $self->{m11} * $self->{m22} - $self->{m12} * $self->{m21};
+}
+
+
 # sets the 6 specifiable parts of the transformation matrix
 sub set_matrix_2x3 {
 	my $self = shift;
@@ -335,15 +370,15 @@ sub matrix_multiply {
 
 =item Apple Quartz 2D Programming Guide - The Math Behind the Matrices
 
-L<http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_affine/chapter_6_section_7.html>
+L<http://developer.apple.com/library/mac/DOCUMENTATION/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_affine/dq_affine.html#//apple_ref/doc/uid/TP30001066-CH204-CJBECIAD>
 
 =item Sun Java java.awt.geom.AffineTransform
 
-L<http://java.sun.com/j2se/1.4.2/docs/api/java/awt/geom/AffineTransform.html>
+L<http://download.oracle.com/javase/1.4.2/docs/api/java/awt/geom/AffineTransform.html>
 
 =item Wikipedia - Matrix Multiplication
 
-L<http://en.wikipedia.org/wiki/Matrix_(mathematics)#Matrix_multiplication>
+L<http://en.wikipedia.org/wiki/Matrix_(mathematics)#Matrix_multiplication.2C_linear_equations_and_linear_transformations>
 
 =back
 
